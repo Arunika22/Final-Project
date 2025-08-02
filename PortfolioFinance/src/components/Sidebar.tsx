@@ -1,4 +1,4 @@
-import { Home, PieChart, TrendingUp, Settings, Wallet, History } from 'lucide-react'
+import { Home, PieChart, TrendingUp, Settings, Wallet, History, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -14,6 +14,7 @@ const navigation = [
   { id: 'trade', label: 'Trade', icon: Wallet },
   { id: 'history', label: 'History', icon: History },
   { id: 'settings', label: 'Settings', icon: Settings },
+  { id: 'verify', label: 'Verify Data', icon: CheckCircle },
 ]
 
 export function Sidebar({ activeTab, onTabChange, isOpen }: SidebarProps) {

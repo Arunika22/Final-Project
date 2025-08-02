@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
@@ -8,9 +9,30 @@ import { TrendingUp, TrendingDown } from 'lucide-react'
 const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444']
 
 export function Portfolio() {
-  const pieData = mockPortfolio.assets.map((asset, index) => ({
+  const [assets, setAssets] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/assets')
+      .then(res => res.json())
+      .then(data => {
+        setAssets(data)
+        console.log('Database assets:', data)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Error:', err)
+        setLoading(false)
+      })
+  }, [])
+
+  if (loading) return <div className="text-center p-8">Loading from database...</div>
+
+  const validAssets = assets.filter(asset => parseFloat(asset.current_price) > 0)
+  const totalValue = validAssets.reduce((sum, asset) => sum + parseFloat(asset.current_price), 0)
+  const pieData = validAssets.slice(0, 5).map((asset, index) => ({
     name: asset.symbol,
-    value: asset.value || 0,
+    value: parseFloat(asset.current_price),
     color: COLORS[index % COLORS.length]
   }))
 
@@ -22,10 +44,10 @@ export function Portfolio() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Portfolio Value</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{formatCurrency(mockPortfolio.totalValue)}</div>
-            <div className={`flex items-center gap-1 text-sm ${mockPortfolio.totalChange24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {mockPortfolio.totalChange24h >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-              {formatPercentage(mockPortfolio.totalChange24h)} (24h)
+            <div className="text-3xl font-bold">{formatCurrency(totalValue)}</div>
+            <div className="flex items-center gap-1 text-sm text-green-500">
+              <TrendingUp className="h-4 w-4" />
+              Live from Database
             </div>
           </CardContent>
         </Card>
@@ -45,7 +67,7 @@ export function Portfolio() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Assets</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockPortfolio.assets.length}</div>
+            <div className="text-2xl font-bold">{validAssets.length}</div>
             <div className="text-muted-foreground text-sm">Cryptocurrencies</div>
           </CardContent>
         </Card>
@@ -111,23 +133,27 @@ export function Portfolio() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {mockPortfolio.assets.map((asset) => (
+                {validAssets.map((asset) => (
                   <div key={asset.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
-                        {asset.symbol.charAt(0)}
-                      </div>
+                      {asset.logo_url ? (
+                        <img src={asset.logo_url} alt={asset.symbol} className="w-10 h-10 rounded-full" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                          {asset.symbol.charAt(0)}
+                        </div>
+                      )}
                       <div>
                         <div className="font-medium">{asset.name}</div>
-                        <div className="text-sm text-muted-foreground">{asset.symbol}</div>
+                        <div className="text-sm text-muted-foreground">{asset.symbol} • {asset.type}</div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-medium">{formatCurrency(asset.value || 0)}</div>
-                      <div className="text-sm text-muted-foreground">{asset.holdings} {asset.symbol}</div>
+                      <div className="font-medium">{formatCurrency(parseFloat(asset.current_price))}</div>
+                      <div className="text-sm text-muted-foreground">Current Price</div>
                     </div>
-                    <div className={`text-sm ${asset.change24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                      {formatPercentage(asset.change24h)}
+                    <div className="text-sm text-green-500">
+                      ProjectData DB
                     </div>
                   </div>
                 ))}
@@ -144,9 +170,9 @@ export function Portfolio() {
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">24h Change</div>
-                  <div className={`text-2xl font-bold ${mockPortfolio.totalChange24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {formatPercentage(mockPortfolio.totalChange24h)}
+                  <div className="text-sm text-muted-foreground">ProjectData DB</div>
+                  <div className="text-2xl font-bold text-green-500">
+                    ✓ Connected
                   </div>
                 </div>
                 <div className="space-y-2">

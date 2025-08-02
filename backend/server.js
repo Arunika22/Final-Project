@@ -13,13 +13,15 @@ const portfolioRoutes = require('./routes/portfolios');
 const portfolioHistoryRoutes = require('./routes/portfolioHistory');
 const transactionRoutes = require('./routes/transactions');
 const userRoutes = require('./routes/users');
+const holdingsRoutes = require('./routes/holdings');
+const verifyRoutes = require('./routes/verify');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true
 }));
 app.use(express.json());
@@ -33,6 +35,8 @@ app.use('/api/portfolios', portfolioRoutes);
 app.use('/api/portfolio-history', portfolioHistoryRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/holdings', holdingsRoutes);
+app.use('/api/verify', verifyRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

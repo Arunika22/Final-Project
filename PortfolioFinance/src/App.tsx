@@ -4,6 +4,8 @@ import { Sidebar } from '@/components/Sidebar'
 import { Portfolio } from '@/components/Portfolio'
 import { Market } from '@/components/Market'
 import { Trade } from '@/components/Trade'
+import { ConnectionTest } from '@/components/ConnectionTest'
+import { DataVerification } from '@/components/DataVerification'
 import { testBackendConnection, testGetAssets } from './testConnection'
 
 function App() {
@@ -34,14 +36,9 @@ function App() {
           </div>
         )
       case 'settings':
-        return (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-2">Settings</h2>
-              <p className="text-muted-foreground">Account and app settings</p>
-            </div>
-          </div>
-        )
+        return <ConnectionTest />
+      case 'verify':
+        return <DataVerification />
       default:
         return <Portfolio />
     }
@@ -51,15 +48,7 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      {/* Test Connection Button */}
-      <div className="fixed top-20 right-4 z-50">
-        <button 
-          onClick={handleTestConnection}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-        >
-          Test Backend
-        </button>
-      </div>
+
       
       <div className="flex">
         <Sidebar 

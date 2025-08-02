@@ -2,7 +2,7 @@ const db = require('../config/database');
 
 class Asset {
   static async findAll() {
-    const [rows] = await db.execute('SELECT * FROM assets ORDER BY created_at DESC');
+    const [rows] = await db.execute('SELECT * FROM assets ORDER BY id');
     return rows;
   }
 
